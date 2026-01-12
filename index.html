@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiaVision - CV Quality Assurance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --industrial-orange: #ff6b00;
+            --industrial-yellow: #ffc107;
+            --industrial-green: #00c853;
+            --industrial-red: #ff1744;
+            --industrial-blue: #2979ff;
+            --steel-dark: #1a1d21;
+            --steel-mid: #2d3139;
+            --steel-light: #3d4451;
+            --steel-lighter: #4d5563;
+            --text-white: #ffffff;
+            --text-gray: #9ca3af;
+            --text-dim: #6b7280;
+            --border-steel: #404854;
+            --warning-stripe: repeating-linear-gradient(
+                45deg,
+                #ffc107,
+                #ffc107 10px,
+                #1a1d21 10px,
+                #1a1d21 20px
+            );
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Archivo', sans-serif;
+            background: var(--steel-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--steel-mid);
+            border-bottom: 3px solid var(--industrial-orange);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--industrial-orange);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.4);
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border: 2px solid var(--industrial-orange);
+            border-radius: 10px;
+            opacity: 0.5;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-white);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.65rem;
+            color: var(--industrial-orange);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .badge {
+            background: var(--steel-light);
+            border: 1px solid var(--border-steel);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: rgba(0, 200, 83, 0.15);
+            border-color: var(--industrial-green);
+            color: var(--industrial-green);
+        }
+
+        .badge.active::before {
+            content: '●';
+            margin-right: 6px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .main {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem 0;
+        }
+
+        .hero h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero h1 span {
+            color: var(--industrial-orange);
+        }
+
+        .hero p {
+            color: var(--text-gray);
+            font-size: 1rem;
+            max-width: 650px;
+            margin: 0 auto;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1300px) {
+            .workspace { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--steel-mid);
+            border: 1px solid var(--border-steel);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-steel);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(180deg, rgba(255, 107, 0, 0.05) 0%, transparent 100%);
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-body { padding: 1.5rem; }
+
+        /* Image Selection Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .image-item {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid var(--border-steel);
+            transition: all 0.3s;
+            position: relative;
+            background: var(--steel-light);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-item:hover {
+            border-color: var(--steel-lighter);
+            transform: scale(1.02);
+        }
+
+        .image-item.selected {
+            border-color: var(--industrial-orange);
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+        }
+
+        .image-item.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: var(--industrial-orange);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .image-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 1.5rem 0.5rem 0.5rem;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Inspection Type */
+        .inspection-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .inspection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .inspection-item {
+            background: var(--steel-light);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .inspection-item:hover {
+            border-color: var(--border-steel);
+        }
+
+        .inspection-item.selected {
+            border-color: var(--industrial-orange);
+            background: rgba(255, 107, 0, 0.1);
+        }
+
+        .inspection-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .inspection-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .inspection-desc {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* Sensitivity Slider */
+        .sensitivity-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sensitivity-container {
+            background: var(--steel-light);
+            border-radius: 6px;
+            padding: 1.25rem;
+        }
+
+        .sensitivity-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .sensitivity-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--industrial-orange);
+        }
+
+        .sensitivity-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--steel-dark);
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .sensitivity-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--industrial-orange);
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
+        }
+
+        .sensitivity-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* Detection View */
+        .detection-container {
+            background: var(--steel-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: none;
+        }
+
+        .detection-container.active { display: block; }
+
+        .detection-header {
+            background: var(--steel-mid);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-steel);
+        }
+
+        .detection-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detection-stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .detection-stat {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        .detection-stat.pass { color: var(--industrial-green); }
+        .detection-stat.fail { color: var(--industrial-red); }
+        .detection-stat.warn { color: var(--industrial-yellow); }
+
+        .detection-image-container {
+            position: relative;
+            aspect-ratio: 16/10;
+        }
+
+        .detection-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: repeating-conic-gradient(var(--steel-light) 0% 25%, var(--steel-dark) 0% 50%) 50% / 20px 20px;
+        }
+
+        .detection-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .defect-box {
+            position: absolute;
+            border: 3px solid var(--industrial-red);
+            background: rgba(255, 23, 68, 0.15);
+            border-radius: 4px;
+            animation: defect-pulse 1.5s infinite;
+        }
+
+        .defect-box::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -24px;
+            left: 0;
+            background: var(--industrial-red);
+            color: white;
+            padding: 2px 8px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 3px;
+        }
+
+        .ok-box {
+            position: absolute;
+            border: 2px solid var(--industrial-green);
+            background: rgba(0, 200, 83, 0.1);
+            border-radius: 4px;
+        }
+
+        @keyframes defect-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(255, 23, 68, 0); }
+        }
+
+        .detection-footer {
+            background: var(--steel-mid);
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .result-item {
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .result-value.pass { color: var(--industrial-green); }
+        .result-value.fail { color: var(--industrial-red); }
+        .result-value.warn { color: var(--industrial-yellow); }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-family: 'Archivo', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--industrial-orange);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #ff8533;
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary {
+            background: var(--steel-light);
+            color: var(--text-gray);
+            border: 1px solid var(--border-steel);
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--steel-lighter);
+            color: var(--text-white);
+            border-color: var(--industrial-orange);
+        }
+
+        /* Sidebar */
+        .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+
+        .stat-card {
+            background: var(--steel-light);
+            border-radius: 6px;
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card.pass { border-left: 4px solid var(--industrial-green); }
+        .stat-card.fail { border-left: 4px solid var(--industrial-red); }
+        .stat-card.warn { border-left: 4px solid var(--industrial-yellow); }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 0.25rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-steel);
+            font-size: 0.8rem;
+        }
+
+        .stat-row:last-child { border-bottom: none; }
+
+        .stat-row-label { color: var(--text-dim); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; }
+        .stat-row-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--industrial-orange); }
+
+        /* History */
+        .history-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--steel-dark);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--industrial-green);
+        }
+
+        .history-item.fail { border-left-color: var(--industrial-red); }
+
+        .history-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--steel-light);
+        }
+
+        .history-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        .history-info { flex: 1; }
+        .history-name { font-size: 0.75rem; font-weight: 600; margin-bottom: 0.2rem; text-transform: uppercase; }
+        .history-meta { font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+        /* Processing Overlay */
+        .processing-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 29, 33, 0.98);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .processing-overlay.active { display: flex; }
+
+        .processing-animation {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: var(--industrial-orange);
+            box-shadow: 0 0 20px var(--industrial-orange);
+            animation: scan 2s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0%, 100% { top: 0; }
+            50% { top: calc(100% - 4px); }
+        }
+
+        .scan-frame {
+            position: absolute;
+            inset: 0;
+            border: 3px solid var(--industrial-orange);
+            border-radius: 8px;
+        }
+
+        .scan-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--industrial-orange);
+        }
+
+        .scan-corner.tl { top: -3px; left: -3px; border-right: none; border-bottom: none; }
+        .scan-corner.tr { top: -3px; right: -3px; border-left: none; border-bottom: none; }
+        .scan-corner.bl { bottom: -3px; left: -3px; border-right: none; border-top: none; }
+        .scan-corner.br { bottom: -3px; right: -3px; border-left: none; border-top: none; }
+
+        .processing-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .processing-stage {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .processing-progress {
+            width: 320px;
+            height: 8px;
+            background: var(--steel-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .processing-bar {
+            height: 100%;
+            background: var(--industrial-orange);
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.5);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--steel-mid);
+            border: 2px solid var(--industrial-green);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 10px 40px rgba(0, 200, 83, 0.3);
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.fail { border-color: var(--industrial-red); box-shadow: 0 10px 40px rgba(255, 23, 68, 0.3); }
+
+        .toast-icon { font-size: 1.5rem; }
+        .toast-title { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; }
+        .toast-message { font-size: 0.75rem; color: var(--text-dim); }
+
+        /* Warning Banner */
+        .warning-banner {
+            background: var(--warning-stripe);
+            padding: 0.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        .warning-banner.active { display: block; }
+
+        .warning-content {
+            background: var(--steel-dark);
+            padding: 0.5rem 1rem;
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--industrial-yellow);
+        }
+    </style>
+</head>
+<body>
+    <div class="warning-banner" id="warningBanner">
+        <span class="warning-content">⚠️ Defects Detected - Manual Review Required</span>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">👁️</div>
+                <div>
+                    <div class="logo-text">SiaVision</div>
+                    <div class="logo-subtitle">CV Quality Assurance</div>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="badge active">System Online</span>
+                <span class="badge">YOLOv8</span>
+                <span class="badge">Edge Optimized</span>
+                <span class="badge">99.4% Accuracy</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="hero">
+            <h1>👁️ <span>Vision</span> QA System</h1>
+            <p>Real-time defect detection and quality inspection powered by computer vision</p>
+        </div>
+
+        <div class="workspace">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📷 Select Inspection Image</h3>
+                    <span style="font-size: 0.7rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">Click to select</span>
+                </div>
+                <div class="card-body">
+                    <div class="image-grid" id="imageGrid"></div>
+
+                    <div class="inspection-section">
+                        <div class="section-label">Inspection Type</div>
+                        <div class="inspection-grid">
+                            <div class="inspection-item selected" onclick="selectInspection(this, 'defect')">
+                                <div class="inspection-icon">🔍</div>
+                                <div class="inspection-name">Defect Detection</div>
+                                <div class="inspection-desc">Surface anomalies</div>
+                            </div>
+                            <div class="inspection-item" onclick="selectInspection(this, 'assembly')">
+                                <div class="inspection-icon">🔧</div>
+                                <div class="inspection-name">Assembly Check</div>
+                                <div class="inspection-desc">Component presence</div>
+                            </div>
+                            <div class="inspection-item" onclick="selectInspection(this, 'dimension')">
+                                <div class="inspection-icon">📏</div>
+                                <div class="inspection-name">Dimension</div>
+                                <div class="inspection-desc">Size validation</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sensitivity-section">
+                        <div class="section-label">Detection Sensitivity</div>
+                        <div class="sensitivity-container">
+                            <div class="sensitivity-header">
+                                <span>Threshold</span>
+                                <span class="sensitivity-value" id="sensitivityValue">0.75</span>
+                            </div>
+                            <input type="range" class="sensitivity-slider" id="sensitivitySlider" min="0" max="100" value="75" oninput="updateSensitivity()">
+                            <div class="sensitivity-labels">
+                                <span>Low (More Defects)</span>
+                                <span>High (Fewer Defects)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="inspectBtn" onclick="runInspection()" disabled>
+                        <span>🔍</span> Run Inspection
+                    </button>
+
+                    <div class="detection-container" id="detectionContainer">
+                        <div class="detection-header">
+                            <span class="detection-title">Inspection Results</span>
+                            <div class="detection-stats">
+                                <span class="detection-stat pass" id="passCount">PASS: 0</span>
+                                <span class="detection-stat fail" id="failCount">FAIL: 0</span>
+                                <span class="detection-stat warn" id="warnCount">WARN: 0</span>
+                            </div>
+                        </div>
+                        <div class="detection-image-container">
+                            <img id="detectionImage" class="detection-image" src="" alt="Detection">
+                            <div class="detection-overlay" id="detectionOverlay"></div>
+                        </div>
+                        <div class="detection-footer">
+                            <div class="result-item">
+                                <div class="result-label">Overall Status</div>
+                                <div class="result-value" id="overallStatus">—</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Confidence</div>
+                                <div class="result-value" id="confidence">—</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Inference Time</div>
+                                <div class="result-value" id="inferenceTime">—</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Defects Found</div>
+                                <div class="result-value" id="defectsFound">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons" id="actionButtons" style="display: none;">
+                        <button class="btn btn-secondary" onclick="exportReport()">📋 Export Report</button>
+                        <button class="btn btn-secondary" onclick="downloadImage()">📥 Download Image</button>
+                        <button class="btn btn-secondary" onclick="flagReview()">🚩 Flag for Review</button>
+                        <button class="btn btn-secondary" onclick="runBatch()">📁 Batch Process</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 Session Stats</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-card pass">
+                            <div class="stat-label">Pass Rate</div>
+                            <div class="stat-value" style="color: var(--industrial-green);" id="passRate">—</div>
+                            <div class="stat-subtitle">Current session</div>
+                        </div>
+
+                        <div style="margin-top: 1rem;">
+                            <div class="stat-row">
+                                <span class="stat-row-label">Images Inspected</span>
+                                <span class="stat-row-value" id="totalInspected">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Defects Detected</span>
+                                <span class="stat-row-value" id="totalDefects">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Avg Inference</span>
+                                <span class="stat-row-value" id="avgInference">—</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Model</span>
+                                <span class="stat-row-value">YOLOv8-seg</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Runtime</span>
+                                <span class="stat-row-value">ONNX/TensorRT</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Device</span>
+                                <span class="stat-row-value">CUDA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📜 Recent Inspections</h3>
+                    </div>
+                    <div class="card-body" id="historyPanel">
+                        <div style="color: var(--text-dim); font-size: 0.75rem; text-align: center; padding: 1rem; text-transform: uppercase;">
+                            No inspections yet
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">⚙️ Defect Classes</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="font-size: 0.8rem; line-height: 2;">
+                            <p><span style="color: var(--industrial-red);">●</span> <strong>SCRATCH</strong> - Surface scratches</p>
+                            <p><span style="color: var(--industrial-red);">●</span> <strong>DENT</strong> - Impact damage</p>
+                            <p><span style="color: var(--industrial-yellow);">●</span> <strong>STAIN</strong> - Discoloration</p>
+                            <p><span style="color: var(--industrial-yellow);">●</span> <strong>CRACK</strong> - Structural cracks</p>
+                            <p><span style="color: var(--industrial-green);">●</span> <strong>OK</strong> - No defects</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-animation">
+            <div class="scan-frame"></div>
+            <div class="scan-line"></div>
+            <div class="scan-corner tl"></div>
+            <div class="scan-corner tr"></div>
+            <div class="scan-corner bl"></div>
+            <div class="scan-corner br"></div>
+        </div>
+        <div class="processing-text">Scanning...</div>
+        <div class="processing-stage" id="processingStage">Initializing detection model...</div>
+        <div class="processing-progress">
+            <div class="processing-bar" id="processingBar"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span class="toast-icon">✅</span>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle">Inspection Complete</div>
+            <div class="toast-message" id="toastMessage">No defects detected</div>
+        </div>
+    </div>
+
+    <script>
+        // Sample industrial images
+        const productImages = [
+            { id: 1, name: 'PCB Board', url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400', category: 'Electronics' },
+            { id: 2, name: 'Metal Surface', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400', category: 'Metal' },
+            { id: 3, name: 'Machined Part', url: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400', category: 'Manufacturing' },
+            { id: 4, name: 'Assembly Line', url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400', category: 'Assembly' },
+            { id: 5, name: 'Weld Joint', url: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=400', category: 'Welding' },
+            { id: 6, name: 'Textile', url: 'https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400', category: 'Fabric' },
+            { id: 7, name: 'Glass Panel', url: 'https://images.unsplash.com/photo-1501621965065-c6e1cf6b0c7b?w=400', category: 'Glass' },
+            { id: 8, name: 'Packaging', url: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=400', category: 'Packaging' }
+        ];
+
+        let selectedImage = null;
+        let selectedInspection = 'defect';
+        let sensitivity = 0.75;
+        let sessionStats = { inspected: 0, defects: 0, passed: 0, inferenceTimes: [] };
+        let inspectionHistory = [];
+
+        function init() {
+            renderImageGrid();
+        }
+
+        function renderImageGrid() {
+            const grid = document.getElementById('imageGrid');
+            grid.innerHTML = productImages.map(img => `
+                <div class="image-item" onclick="selectImage(${img.id})" id="img-${img.id}">
+                    <img src="${img.url}" alt="${img.name}">
+                    <div class="image-label">${img.name}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectImage(id) {
+            document.querySelectorAll('.image-item').forEach(item => item.classList.remove('selected'));
+            document.getElementById(`img-${id}`).classList.add('selected');
+            selectedImage = productImages.find(img => img.id === id);
+            document.getElementById('inspectBtn').disabled = false;
+            document.getElementById('detectionContainer').classList.remove('active');
+            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('warningBanner').classList.remove('active');
+        }
+
+        function selectInspection(element, type) {
+            document.querySelectorAll('.inspection-item').forEach(item => item.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedInspection = type;
+        }
+
+        function updateSensitivity() {
+            const slider = document.getElementById('sensitivitySlider');
+            sensitivity = slider.value / 100;
+            document.getElementById('sensitivityValue').textContent = sensitivity.toFixed(2);
+        }
+
+        function runInspection() {
+            if (!selectedImage) return;
+
+            const overlay = document.getElementById('processingOverlay');
+            const bar = document.getElementById('processingBar');
+            const stage = document.getElementById('processingStage');
+
+            overlay.classList.add('active');
+
+            const stages = [
+                'Initializing detection model...',
+                'Loading image tensor...',
+                'Running inference...',
+                'Applying NMS filtering...',
+                'Generating bounding boxes...',
+                'Computing confidence scores...',
+                'Finalizing results...'
+            ];
+
+            let progress = 0;
+            let stageIndex = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 8;
+                if (progress > 100) progress = 100;
+                bar.style.width = progress + '%';
+
+                const newStage = Math.floor((progress / 100) * stages.length);
+                if (newStage !== stageIndex && newStage < stages.length) {
+                    stageIndex = newStage;
+                    stage.textContent = stages[stageIndex];
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                        showResults();
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        function showResults() {
+            const container = document.getElementById('detectionContainer');
+            const overlay = document.getElementById('detectionOverlay');
+            const img = document.getElementById('detectionImage');
+
+            img.src = selectedImage.url;
+            container.classList.add('active');
+            document.getElementById('actionButtons').style.display = 'grid';
+
+            // Simulate detection results
+            const hasDefects = Math.random() > 0.6;
+            const defectCount = hasDefects ? Math.floor(Math.random() * 3) + 1 : 0;
+            const inferenceTime = Math.floor(Math.random() * 30 + 15);
+            const confidence = (Math.random() * 8 + 91).toFixed(1);
+
+            // Update stats
+            sessionStats.inspected++;
+            sessionStats.defects += defectCount;
+            if (!hasDefects) sessionStats.passed++;
+            sessionStats.inferenceTimes.push(inferenceTime);
+
+            // Update UI
+            document.getElementById('passCount').textContent = `PASS: ${sessionStats.passed}`;
+            document.getElementById('failCount').textContent = `FAIL: ${sessionStats.inspected - sessionStats.passed}`;
+            document.getElementById('warnCount').textContent = `WARN: ${Math.floor(defectCount / 2)}`;
+
+            document.getElementById('overallStatus').textContent = hasDefects ? 'FAIL' : 'PASS';
+            document.getElementById('overallStatus').className = `result-value ${hasDefects ? 'fail' : 'pass'}`;
+            document.getElementById('confidence').textContent = confidence + '%';
+            document.getElementById('inferenceTime').textContent = inferenceTime + 'ms';
+            document.getElementById('defectsFound').textContent = defectCount;
+            document.getElementById('defectsFound').className = `result-value ${defectCount > 0 ? 'fail' : 'pass'}`;
+
+            // Sidebar stats
+            const passRate = ((sessionStats.passed / sessionStats.inspected) * 100).toFixed(0);
+            document.getElementById('passRate').textContent = passRate + '%';
+            document.getElementById('totalInspected').textContent = sessionStats.inspected;
+            document.getElementById('totalDefects').textContent = sessionStats.defects;
+            const avgInf = sessionStats.inferenceTimes.reduce((a, b) => a + b, 0) / sessionStats.inferenceTimes.length;
+            document.getElementById('avgInference').textContent = avgInf.toFixed(0) + 'ms';
+
+            // Draw detection boxes
+            overlay.innerHTML = '';
+            if (hasDefects) {
+                const defectTypes = ['SCRATCH', 'DENT', 'STAIN', 'CRACK'];
+                for (let i = 0; i < defectCount; i++) {
+                    const box = document.createElement('div');
+                    box.className = 'defect-box';
+                    box.style.left = (Math.random() * 60 + 10) + '%';
+                    box.style.top = (Math.random() * 60 + 10) + '%';
+                    box.style.width = (Math.random() * 15 + 8) + '%';
+                    box.style.height = (Math.random() * 15 + 8) + '%';
+                    box.dataset.label = defectTypes[Math.floor(Math.random() * defectTypes.length)];
+                    overlay.appendChild(box);
+                }
+                document.getElementById('warningBanner').classList.add('active');
+            } else {
+                const okBox = document.createElement('div');
+                okBox.className = 'ok-box';
+                okBox.style.left = '10%';
+                okBox.style.top = '10%';
+                okBox.style.width = '80%';
+                okBox.style.height = '80%';
+                overlay.appendChild(okBox);
+            }
+
+            // Add to history
+            addToHistory(hasDefects, defectCount);
+
+            // Show toast
+            const toast = document.getElementById('toast');
+            if (hasDefects) {
+                toast.classList.add('fail');
+                showToast('⚠️ Defects Detected', `${defectCount} defect(s) found`);
+            } else {
+                toast.classList.remove('fail');
+                showToast('✅ Inspection Passed', 'No defects detected');
+            }
+        }
+
+        function addToHistory(hasFailed, defectCount) {
+            const item = {
+                id: Date.now(),
+                name: selectedImage.name,
+                thumbnail: selectedImage.url,
+                status: hasFailed ? 'fail' : 'pass',
+                defects: defectCount,
+                time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+            inspectionHistory.unshift(item);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const panel = document.getElementById('historyPanel');
+            if (inspectionHistory.length === 0) {
+                panel.innerHTML = '<div style="color: var(--text-dim); font-size: 0.75rem; text-align: center; padding: 1rem; text-transform: uppercase;">No inspections yet</div>';
+                return;
+            }
+
+            panel.innerHTML = inspectionHistory.slice(0, 5).map(item => `
+                <div class="history-item ${item.status}">
+                    <div class="history-thumb"><img src="${item.thumbnail}" alt=""></div>
+                    <div class="history-info">
+                        <div class="history-name">${item.name}</div>
+                        <div class="history-meta">${item.status.toUpperCase()} · ${item.defects} defects · ${item.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function exportReport() { showToast('Exporting', 'Generating PDF report...'); }
+        function downloadImage() { showToast('Downloading', 'Preparing annotated image...'); }
+        function flagReview() { showToast('Flagged', 'Sent to quality team'); }
+        function runBatch() { showToast('Batch Mode', 'Select folder to process...'); }
+
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        init();
+    </script>
+</body>
+</html>
